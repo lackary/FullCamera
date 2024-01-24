@@ -1,6 +1,11 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("androidx.navigation.safeargs")
+    id("kotlin-parcelize")
+    id("kotlin-android")
+    id("kotlin-kapt")
+
 }
 
 android {
@@ -38,17 +43,31 @@ android {
     }
 
     buildFeatures {
+        dataBinding = true
         viewBinding = true
         buildConfig = true
     }
 }
 
 dependencies {
+    val lifecycleVersion = "2.7.0"
+    val navVersion = "2.7.6"
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    // LiveData
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+    // Lifecycles only (without ViewModel or LiveData)
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
+
+    // Kotlin
+    implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
+    implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
 
     // Logcat
     implementation("com.jakewharton.timber:timber:5.0.1")
