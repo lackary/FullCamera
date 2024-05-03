@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Camera2Control"
+rootProject.name = "fullcamera"
 include(":app")
  

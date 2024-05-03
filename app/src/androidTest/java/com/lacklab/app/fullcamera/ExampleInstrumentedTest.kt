@@ -1,4 +1,4 @@
-package com.lacklab.app.camera2control
+package com.lacklab.app.fullcamera
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.lacklab.app.camera2control", appContext.packageName)
+        assertEquals("com.lacklab.app.fullcamera", appContext.packageName)
     }
 }

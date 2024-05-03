@@ -1,8 +1,8 @@
-package com.lacklab.app.camera2control
+package com.lacklab.app.fullcamera
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.lacklab.app.camera2control.databinding.ActivityMainBinding
+import com.lacklab.app.fullcamera.databinding.ActivityMainBinding
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Camera2Control</string>
+    <string name="app_name">Full Camera</string>
 
     <string name="camera_title">Camera Id %s</string>
 

@@ -1,4 +1,4 @@
-package com.lacklab.app.camera2control
+package com.lacklab.app.fullcamera
 
 import org.junit.Test
 

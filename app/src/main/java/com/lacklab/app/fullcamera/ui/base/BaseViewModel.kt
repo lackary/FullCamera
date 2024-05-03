@@ -1,4 +1,4 @@
-package com.lacklab.app.camera2control.ui.base
+package com.lacklab.app.fullcamera.ui.base
 
 import androidx.lifecycle.ViewModel
 

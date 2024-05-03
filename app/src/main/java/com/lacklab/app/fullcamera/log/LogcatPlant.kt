@@ -1,4 +1,4 @@
-package com.lacklab.app.camera2control.log
+package com.lacklab.app.fullcamera.log
 
 import timber.log.Timber
 

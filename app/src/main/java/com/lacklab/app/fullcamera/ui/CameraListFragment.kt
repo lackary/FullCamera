@@ -1,24 +1,16 @@
-package com.lacklab.app.camera2control.ui
+package com.lacklab.app.fullcamera.ui
 
 import android.content.Context
-import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
-import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.view.get
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.lacklab.app.camera2control.R
-import com.lacklab.app.camera2control.data.CameraDevice2Info
-import com.lacklab.app.camera2control.databinding.FragmentCameraListBinding
-import com.lacklab.app.camera2control.ui.adapter.GenericAdapter
-import com.lacklab.app.camera2control.ui.base.BaseFragment
-import timber.log.Timber
+import com.lacklab.app.fullcamera.R
+import com.lacklab.app.fullcamera.data.CameraDevice2Info
+import com.lacklab.app.fullcamera.databinding.FragmentCameraListBinding
+import com.lacklab.app.fullcamera.ui.adapter.GenericAdapter
+import com.lacklab.app.fullcamera.ui.base.BaseFragment
 
 class CameraListFragment : BaseFragment<FragmentCameraListBinding, CameraListViewModel>() {
 

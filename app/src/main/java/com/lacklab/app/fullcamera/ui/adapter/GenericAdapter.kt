@@ -1,4 +1,4 @@
-package com.lacklab.app.camera2control.ui.adapter
+package com.lacklab.app.fullcamera.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View

@@ -1,8 +1,8 @@
-package com.lacklab.app.camera2control
+package com.lacklab.app.fullcamera
 
 import android.app.Application
 import android.content.Context
-import com.lacklab.app.camera2control.log.LogcatPlant
+import com.lacklab.app.fullcamera.log.LogcatPlant
 import timber.log.Timber
 
 class MainApplication : Application() {

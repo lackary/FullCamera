@@ -1,4 +1,4 @@
-package com.lacklab.app.camera2control.data
+package com.lacklab.app.fullcamera.data
 
 import android.graphics.ImageFormat
 import android.os.Parcelable
