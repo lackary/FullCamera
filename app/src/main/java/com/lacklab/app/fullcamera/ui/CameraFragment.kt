@@ -109,14 +109,8 @@ class CameraFragment : BaseFragment<FragmentCameraBinding, CameraViewModel>() {
         with(binding) {
             surfaceViewPreview.holder.addCallback(object : SurfaceHolder.Callback {
                 override fun surfaceCreated(p0: SurfaceHolder) {
-                    previewSize = getPreviewOutputSize(
-                        surfaceViewPreview.display,
-                        characteristics,
-                        SurfaceHolder::class.java
-                    )
                     Timber.d("SurfaceView size: ${surfaceViewPreview.width} x ${surfaceViewPreview.height}")
-                    Timber.d("selected preview size: $previewSize")
-                    surfaceViewPreview.setAspectRatio(previewSize.width, previewSize.height)
+                    surfaceViewPreview.setAspectRatio(previewResolution.width, previewResolution.height)
                     view?.post{ initCamera(surfaceViewPreview)}
                 }
 

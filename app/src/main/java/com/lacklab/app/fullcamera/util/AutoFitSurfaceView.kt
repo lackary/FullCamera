@@ -16,6 +16,7 @@ class AutoFitSurfaceView @JvmOverloads constructor(
 
     fun setAspectRatio(width: Int, height: Int) {
         require(width > 0 && height > 0) { "Size cannot be negative" }
+        Timber.d("width: $width, height:$height")
         aspectRatio = width.toFloat() / height.toFloat()
         holder.setFixedSize(width, height)
         requestLayout()
@@ -25,19 +26,21 @@ class AutoFitSurfaceView @JvmOverloads constructor(
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)
+        Timber.d("width: $width, height:$height")
         if (aspectRatio == 0f) {
             setMeasuredDimension(width, height)
         } else {
-            // Performs center-crop transformation of the camera frames
+            // WYSIWYG
             val newWidth: Int
             val newHeight: Int
             val actualRatio = if (width > height) aspectRatio else 1f / aspectRatio
+
             if (width < height * actualRatio) {
-                newHeight = height
-                newWidth = (height * actualRatio).roundToInt()
-            } else {
                 newWidth = width
                 newHeight = (width / actualRatio).roundToInt()
+            } else {
+                newHeight = height
+                newWidth = (height * actualRatio).roundToInt()
             }
 
             Timber.d("Measured dimensions set: $newWidth x $newHeight")
