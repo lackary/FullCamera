@@ -10,7 +10,7 @@ import kotlinx.parcelize.RawValue
 
 @Parcelize
 data class CameraDevice2Info(
-    val logicalCameraId: String?,
+    val logicalCameraId: String,
     val physicalCameraIds: Set<String>?,
     val isMultipleCamera: Boolean,
     var fpsRange: @RawValue Range<Int> = Range(0, 0),

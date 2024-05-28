@@ -1,3 +1,6 @@
+import org.apache.commons.io.output.ByteArrayOutputStream
+import org.bouncycastle.util.Integers
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -8,6 +11,24 @@ plugins {
 
 }
 
+val gitTag = ByteArrayOutputStream().use {
+    project.exec {
+        executable("git")
+        args("describe", "--abbrev=0", "--tag")
+        standardOutput = it
+    }
+    String(it.toByteArray()).trim()
+}
+
+val gitCommitCount = ByteArrayOutputStream().use {
+    project.exec {
+        executable("git")
+        args("rev-list", "--count", "HEAD")
+        standardOutput = it
+    }
+    String(it.toByteArray()).trim().toInt()
+}
+
 android {
     namespace = "com.lacklab.app.fullcamera"
     compileSdk = 34
@@ -16,8 +37,8 @@ android {
         applicationId = "com.lacklab.app.fullcamera"
         minSdk = 30
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.0.1"
+        versionCode = gitCommitCount
+        versionName = gitTag
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

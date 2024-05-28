@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.viewModels
+import androidx.navigation.Navigation
 import com.lacklab.app.fullcamera.R
 import com.lacklab.app.fullcamera.data.CameraDevice2Info
 import com.lacklab.app.fullcamera.databinding.FragmentCameraListBinding
@@ -35,8 +36,12 @@ class CameraListFragment : BaseFragment<FragmentCameraListBinding, CameraListVie
     }
 
     override fun bindVM(binding: FragmentCameraListBinding, vm: CameraListViewModel) {
+        setCameraIdsAdapter(binding, vm)
+    }
+
+    private fun setCameraIdsAdapter(binding: FragmentCameraListBinding, vm: CameraListViewModel) {
+        val cameras = vm.camera2DeviceInfoList.value as List<CameraDevice2Info>
         with(binding) {
-            val cameras = vm.camera2DeviceInfoList.value as List<CameraDevice2Info>
             cameraRecycleView.adapter =
                 GenericAdapter(cameras, android.R.layout.simple_list_item_1) { view, item, _ ->
                     view.findViewById<TextView>(android.R.id.text1).text =
@@ -45,11 +50,12 @@ class CameraListFragment : BaseFragment<FragmentCameraListBinding, CameraListVie
                             "${item.logicalCameraId} ${if(item.isMultipleCamera) item.physicalCameraIds else ""}"
                         )
                     view.setOnClickListener {
-
+                        Navigation.findNavController(requireActivity(), R.id.nav_host_main)
+                            .navigate(CameraListFragmentDirections
+                                .actionCameraListFragmentToCameraFragment(item))
                     }
-            }
+                }
         }
     }
-
 
 }

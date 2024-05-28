@@ -13,6 +13,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(activityMainBinding.root)
 
         Timber.d("TEST")
+        Timber.d("version name: ${BuildConfig.VERSION_NAME}")
+        Timber.d("version code: ${BuildConfig.VERSION_CODE}")
     }
 
 }

@@ -9,5 +9,18 @@
         android:id="@+id/cameraListFragment"
         android:name="com.lacklab.app.fullcamera.ui.CameraListFragment"
         android:label="fragment_camera_list"
-        tools:layout="@layout/fragment_camera_list" />
+        tools:layout="@layout/fragment_camera_list" >
+        <action
+            android:id="@+id/action_cameraListFragment_to_cameraFragment"
+            app:destination="@id/cameraFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.lacklab.app.fullcamera.ui.CameraFragment"
+        android:label="CameraFragment" >
+        <argument
+            android:name="camera_item"
+            app:argType="com.lacklab.app.fullcamera.data.CameraDevice2Info"
+            app:nullable="false"/>
+    </fragment>
 </navigation>
