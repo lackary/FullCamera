@@ -52,6 +52,8 @@ class CameraFragment : BaseFragment<FragmentCameraBinding, CameraViewModel>() {
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     }
 
+    private lateinit var cameraDevice: CameraDevice
+
     private val characteristics: CameraCharacteristics by lazy {
         cameraManager.getCameraCharacteristics(args.cameraItem.logicalCameraId)
     }
@@ -102,7 +104,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding, CameraViewModel>() {
     }
 
     override fun clear() {
-
+        cameraDevice.close()
     }
 
     override fun bindVM(binding: FragmentCameraBinding, vm: CameraViewModel) {
@@ -207,7 +209,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding, CameraViewModel>() {
         }, previewImageReaderHandler)
 
         val targets = listOf(surfaceView.holder.surface, previewImageReader.surface)
-        val cameraDevice = openCamera(cameraManager, args.cameraItem.logicalCameraId, cameraHandler)
+        cameraDevice = openCamera(cameraManager, args.cameraItem.logicalCameraId, cameraHandler)
         captureSession = createCaptureSession(cameraDevice, targets, cameraHandler)
 
         captureRequestBuilder= cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
