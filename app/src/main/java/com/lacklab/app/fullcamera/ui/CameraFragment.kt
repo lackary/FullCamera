@@ -8,8 +8,10 @@ import android.hardware.camera2.CameraCaptureSession.CaptureCallback
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
+import android.hardware.camera2.CaptureFailure
 import android.hardware.camera2.CaptureRequest
 import android.hardware.camera2.CaptureResult
+import android.hardware.camera2.TotalCaptureResult
 import android.hardware.camera2.params.OutputConfiguration
 import android.hardware.camera2.params.SessionConfiguration
 import android.hardware.camera2.params.StreamConfigurationMap
@@ -32,12 +34,10 @@ import com.lacklab.app.fullcamera.util.cam.ability.AeMode
 import com.lacklab.app.fullcamera.util.cam.ability.AwbMode
 import com.lacklab.app.fullcamera.util.cam.ability.CameraCapability
 import com.lacklab.app.fullcamera.util.cam.ability.CameraFormat
-import com.lacklab.app.fullcamera.util.getPreviewOutputSize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
-import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -59,8 +59,12 @@ class CameraFragment : BaseFragment<FragmentCameraBinding, CameraViewModel>() {
     }
 
     // One second
-    private val oneSecond = 1000000000
+    private val oneSecond = 1000000000.0
     private val imageBufferSize = 3
+    // calculate fps
+    private var lastFrameNumber = 0L
+    private var startTime = 0L
+    private var measureFps = 0L
 
     private lateinit var previewImageReader: ImageReader
 
@@ -101,6 +105,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding, CameraViewModel>() {
             resolutionList = getResolutionList(it, previewFormat)
             previewResolution = getMaxResolution(resolutionList)
         }
+
     }
 
     override fun clear() {
@@ -220,7 +225,70 @@ class CameraFragment : BaseFragment<FragmentCameraBinding, CameraViewModel>() {
         }
 
         captureSession.setRepeatingRequest(captureRequestBuilder.build(),
-            object : CaptureCallback() {}, cameraHandler)
+            object : CaptureCallback() {
+                override fun onCaptureStarted(
+                    session: CameraCaptureSession,
+                    request: CaptureRequest,
+                    timestamp: Long,
+                    frameNumber: Long
+                ) {
+                    Timber.d("timestamp: $timestamp, frameNumber: ${frameNumber+1}")
+                    super.onCaptureStarted(session, request, timestamp, frameNumber)
+                }
+
+                override fun onCaptureProgressed(
+                    session: CameraCaptureSession,
+                    request: CaptureRequest,
+                    partialResult: CaptureResult
+                ) {
+                    super.onCaptureProgressed(session, request, partialResult)
+                }
+
+                override fun onCaptureCompleted(
+                    session: CameraCaptureSession,
+                    request: CaptureRequest,
+                    result: TotalCaptureResult
+                ) {
+                    val frameNumber = result.frameNumber
+                    val sensorTimestamp = result.get(CaptureResult.SENSOR_TIMESTAMP)
+
+                    sensorTimestamp?.let {
+                        Timber.d("timestamp: $it, frameNumber: ${result.frameNumber+1}")
+                        if(frameNumber == 0L) {
+                            startTime = it
+                        } else {
+                            val dif = it.minus(startTime)
+                            val sec = dif.div(oneSecond)
+                            Timber.d("second: $sec")
+                            if (sec >= 1.0) {
+                                startTime = it
+                                measureFps = frameNumber - lastFrameNumber
+                                lastFrameNumber = frameNumber
+                                Timber.d("fps: $measureFps")
+                            }
+                        }
+                    }
+                    super.onCaptureCompleted(session, request, result)
+                }
+
+                override fun onCaptureFailed(
+                    session: CameraCaptureSession,
+                    request: CaptureRequest,
+                    failure: CaptureFailure
+                ) {
+                    super.onCaptureFailed(session, request, failure)
+                }
+
+                override fun onCaptureBufferLost(
+                    session: CameraCaptureSession,
+                    request: CaptureRequest,
+                    target: Surface,
+                    frameNumber: Long
+                ) {
+                    super.onCaptureBufferLost(session, request, target, frameNumber)
+                }
+            },
+            cameraHandler)
     }
 
     @Suppress("MissingPermission")
