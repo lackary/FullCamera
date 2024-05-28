@@ -46,10 +46,10 @@ class LogcatPlant : Timber.DebugTree() {
 
     private fun getStackTraceElement(): StackTraceElement {
         return StackTraceElement(
-            Thread.currentThread().stackTrace[STACK_TRACE_LEVELS_UP+1].className,
-            Thread.currentThread().stackTrace[STACK_TRACE_LEVELS_UP+1].methodName,
-            Thread.currentThread().stackTrace[STACK_TRACE_LEVELS_UP+1].fileName,
-            Thread.currentThread().stackTrace[STACK_TRACE_LEVELS_UP+1].lineNumber)
+            Thread.currentThread().stackTrace[STACK_TRACE_LEVELS_UP].className,
+            Thread.currentThread().stackTrace[STACK_TRACE_LEVELS_UP].methodName,
+            Thread.currentThread().stackTrace[STACK_TRACE_LEVELS_UP].fileName,
+            Thread.currentThread().stackTrace[STACK_TRACE_LEVELS_UP].lineNumber)
     }
 
     private fun getLogFormat(): String {
