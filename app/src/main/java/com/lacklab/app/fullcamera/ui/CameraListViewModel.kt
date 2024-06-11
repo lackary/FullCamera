@@ -4,10 +4,13 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import com.lacklab.app.fullcamera.data.CameraDevice2Info
 import com.lacklab.app.fullcamera.ui.base.BaseViewModel
 
-class CameraListViewModel : BaseViewModel() {
+class CameraListViewModel(
+    savedStateHandle: SavedStateHandle,
+) : BaseViewModel() {
     private val _camera2DeviceInfoList = MutableLiveData<List<CameraDevice2Info>>()
     val camera2DeviceInfoList: LiveData<List<CameraDevice2Info>>
         get() = _camera2DeviceInfoList
