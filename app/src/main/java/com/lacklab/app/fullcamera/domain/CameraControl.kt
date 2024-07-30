@@ -16,11 +16,13 @@ import android.os.HandlerThread
 import android.util.Range
 import android.util.Size
 import android.view.Surface
+import com.lacklab.app.fullcamera.data.CameraDevice2Info
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
+import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -57,14 +59,17 @@ class CameraControl {
     private var startTime = 0L
     private var lastFrameNumber = 0L
     private var measureFps = 0L
+    private var isMultiPreview = false
 
     suspend fun initCamera(
         previewSurface: Surface,
         manager: CameraManager,
         cameraId: String,
-        resolution: Size
+        resolution: Size,
+        cameraDevice2Info: CameraDevice2Info?,
+        isMultiPreview: Boolean = false
     ) {
-
+        this.isMultiPreview = isMultiPreview
         previewImageReader = ImageReader.newInstance(
             resolution.width, resolution.height, previewFormat, imageBufferSize
         )
@@ -76,13 +81,16 @@ class CameraControl {
             }
         }, previewImageReaderHandler)
 
-        val targets = listOf(previewSurface, previewImageReader.surface)
+        val targetSurfaces = mutableListOf<Surface>()
+        targetSurfaces.add(previewSurface)
+        targetSurfaces.add(previewImageReader.surface)
         cameraDevice = openCamera(manager, cameraId, cameraHandler)
-        captureSession = createCaptureSession(cameraDevice, targets, cameraHandler)
+        captureSession = createCameraSession(cameraDevice, targetSurfaces, cameraHandler)
 
         captureRequestBuilder= cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
-            addTarget(previewSurface)
-            addTarget(previewImageReader.surface)
+            targetSurfaces.forEach { surface ->
+                addTarget(surface)
+            }
             set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, Range(30, 30))
             set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO)
         }
@@ -90,11 +98,11 @@ class CameraControl {
 
     @Suppress("MissingPermission")
     private suspend fun openCamera(
-        manager: CameraManager,
+        cameraManager: CameraManager,
         cameraId: String,
         handler: Handler
     ): CameraDevice = suspendCancellableCoroutine { cont ->
-        manager.openCamera(cameraId, object : CameraDevice.StateCallback() {
+        cameraManager.openCamera(cameraId, object : CameraDevice.StateCallback() {
             override fun onOpened(device: CameraDevice) {
                 cont.resume(device)
             }
@@ -124,7 +132,7 @@ class CameraControl {
         }, handler)
     }
 
-    private suspend fun createCaptureSession(
+    private suspend fun createCameraSession(
         cameraDevice: CameraDevice,
         targets: List<Surface>,
         handler: Handler
@@ -143,7 +151,52 @@ class CameraControl {
                 }
 
                 override fun onConfigureFailed(cameraCaptureSession: CameraCaptureSession) {
-                    val exception = RuntimeException("Camera ${cameraDevice.id}")
+                    val msg = "Camera ${cameraDevice.id} configure failed"
+                    val exception = RuntimeException(msg)
+                    cont.resumeWithException(exception)
+                }
+            })
+        cameraDevice.createCaptureSession(sessionConfiguration)
+    }
+
+    /**
+     * surfacePairs: List<Pair<Surface?, Surface>>
+     *     first: surfaceView.holder.surface
+     *     second: imageReader.surface
+     * only it can
+     */
+    private suspend fun createMultiCameraSession(
+        cameraDevice: CameraDevice,
+        surfacePairs: List<Pair<Surface?, Surface>>,
+        isMutablePreview: Boolean,
+        physicalIds: List<String>,
+        executor: Executor = Executors.newSingleThreadScheduledExecutor()
+    ): CameraCaptureSession = suspendCancellableCoroutine { cont ->
+        val outputConfigs: MutableList<OutputConfiguration> = mutableListOf()
+        surfacePairs.forEachIndexed { index, pair ->
+            val output = if( index == 0) {
+                pair.first?.let { OutputConfiguration(it) }
+            } else {
+                val surface = if (isMutablePreview) pair.second else pair.first
+                surface?.let {
+                    OutputConfiguration(it).apply {
+                        setPhysicalCameraId(physicalIds[index-1])
+                        enableSurfaceSharing()
+                        addSurface(pair.second)
+                    }
+                }
+            }
+            if (output != null) outputConfigs.add(output)
+        }
+        val sessionConfiguration = SessionConfiguration(SessionConfiguration.SESSION_REGULAR,
+            outputConfigs, executor, object : CameraCaptureSession.StateCallback() {
+                override fun onConfigured(cameraCaptureSession: CameraCaptureSession) {
+                    cont.resume(cameraCaptureSession)
+                }
+
+                override fun onConfigureFailed(session: CameraCaptureSession) {
+                    val msg = "Camera ${cameraDevice.id} multiple configure failed"
+                    val exception = RuntimeException(msg)
                     cont.resumeWithException(exception)
                 }
             })

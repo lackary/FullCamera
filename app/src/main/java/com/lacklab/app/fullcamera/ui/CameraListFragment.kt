@@ -52,7 +52,7 @@ class CameraListFragment : BaseFragment<FragmentCameraListBinding, CameraListVie
                     view.setOnClickListener {
                         Navigation.findNavController(requireActivity(), R.id.nav_host_main)
                             .navigate(CameraListFragmentDirections
-                                .actionCameraListFragmentToCameraFragment(item))
+                                .actionCameraListFragmentToCameraFragment(item, false))
                     }
                 }
         }

@@ -22,5 +22,9 @@
             android:name="camera_item"
             app:argType="com.lacklab.app.fullcamera.data.CameraDevice2Info"
             app:nullable="false"/>
+        <argument
+            android:name="multi_preview"
+            app:argType="boolean"
+            app:nullable="false"/>
     </fragment>
 </navigation>

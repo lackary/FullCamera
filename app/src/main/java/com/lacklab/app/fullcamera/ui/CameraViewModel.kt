@@ -113,7 +113,7 @@ class CameraViewModel(
         return maxSize
     }
     suspend fun initCamera(previewSurface: Surface, manager: CameraManager, cameraId: String) =
-        cameraControl.initCamera(previewSurface, manager, cameraId, previewResolution)
+        cameraControl.initCamera(previewSurface, manager, cameraId, previewResolution, cameraDevice2Info)
 
     suspend fun startPreview() {
         cameraControl.startPreview().collect {
