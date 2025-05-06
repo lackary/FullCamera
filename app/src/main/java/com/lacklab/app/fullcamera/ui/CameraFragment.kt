@@ -1,47 +1,23 @@
 package com.lacklab.app.fullcamera.ui
 
 import android.content.Context
-import android.graphics.ImageFormat
-import android.hardware.camera2.CameraCaptureSession
-import android.hardware.camera2.CameraCaptureSession.CaptureCallback
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
-import android.hardware.camera2.CaptureFailure
-import android.hardware.camera2.CaptureRequest
-import android.hardware.camera2.CaptureResult
-import android.hardware.camera2.TotalCaptureResult
-import android.hardware.camera2.params.OutputConfiguration
-import android.hardware.camera2.params.SessionConfiguration
-import android.hardware.camera2.params.StreamConfigurationMap
 import android.media.ImageReader
 import android.os.Handler
 import android.os.HandlerThread
-import android.util.Range
-import android.util.Size
 import android.view.LayoutInflater
-import android.view.Surface
 import android.view.SurfaceHolder
-import android.view.SurfaceView
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.lacklab.app.fullcamera.databinding.FragmentCameraBinding
 import com.lacklab.app.fullcamera.ui.base.BaseFragment
-import com.lacklab.app.fullcamera.util.cam.ability.AeMode
-import com.lacklab.app.fullcamera.util.cam.ability.AwbMode
-import com.lacklab.app.fullcamera.util.cam.ability.CameraCapability
-import com.lacklab.app.fullcamera.util.cam.ability.CameraFormat
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
-import java.util.concurrent.Executors
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 class CameraFragment : BaseFragment<FragmentCameraBinding, CameraViewModel>() {
     private val cameraViewModel: CameraViewModel by viewModels()
@@ -125,9 +101,15 @@ class CameraFragment : BaseFragment<FragmentCameraBinding, CameraViewModel>() {
                 }
             })
             with(vm) {
-                cameraInfo.observe(viewLifecycleOwner, Observer {
-                    textViewPreviewInfo.text = it
-                })
+                lifecycleScope.launch(Dispatchers.Main) {
+                    cameraInfo.collect { it ->
+                        textViewPreviewInfo.text = it
+                    }
+                }
+//                cameraInfo.observe(viewLifecycleOwner, Observer {
+//                    textViewPreviewInfo.text = it
+//                })
+
             }
         }
     }

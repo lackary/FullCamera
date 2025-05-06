@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_cameraListFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
+        <action
+            android:id="@+id/action_cameraListFragment_to_cameraComposeFragment"
+            app:destination="@id/cameraComposeFragment" />
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"
@@ -27,4 +30,18 @@
             app:argType="boolean"
             app:nullable="false"/>
     </fragment>
+    <fragment
+        android:id="@+id/cameraComposeFragment"
+        android:name="com.lacklab.app.fullcamera.ui.CameraComposeFragment"
+        android:label="CameraComposeFragment" >
+        <argument
+            android:name="camera_item"
+            app:argType="com.lacklab.app.fullcamera.data.CameraDevice2Info"
+            app:nullable="false"/>
+        <argument
+            android:name="multi_preview"
+            app:argType="boolean"
+            app:nullable="false"/>
+    </fragment>
+
 </navigation>

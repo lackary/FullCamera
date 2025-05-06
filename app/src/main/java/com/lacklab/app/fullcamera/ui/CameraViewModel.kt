@@ -1,5 +1,6 @@
 package com.lacklab.app.fullcamera.ui
 
+import android.R
 import android.graphics.ImageFormat
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraCharacteristics
@@ -12,6 +13,8 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.Size
 import android.view.Surface
+import androidx.compose.runtime.MutableState
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import com.lacklab.app.fullcamera.data.CameraDevice2Info
@@ -21,6 +24,8 @@ import com.lacklab.app.fullcamera.util.cam.ability.AeMode
 import com.lacklab.app.fullcamera.util.cam.ability.AwbMode
 import com.lacklab.app.fullcamera.util.cam.ability.CameraCapability
 import com.lacklab.app.fullcamera.util.cam.ability.CameraFormat
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 
 class CameraViewModel(
@@ -41,7 +46,10 @@ class CameraViewModel(
     private val awbModeTextList= mutableListOf<String>()
     private var resolutionList = listOf<Size>()
 
-    var cameraInfo = MutableLiveData<String>()
+    private val _cameraInfo = MutableStateFlow<String>("fps")
+    val cameraInfo: StateFlow<String> = _cameraInfo
+//    var cameraInfo = MutableLiveData<String>()
+
 
     fun getCameraAbility(characteristics: CameraCharacteristics) {
         Timber.d("get streamConfigurationMap")
@@ -117,7 +125,8 @@ class CameraViewModel(
 
     suspend fun startPreview() {
         cameraControl.startPreview().collect {
-            cameraInfo.postValue(it)
+            _cameraInfo.value = it
+//            cameraInfo.postValue(it) #MutableLiveData
         }
     }
 
