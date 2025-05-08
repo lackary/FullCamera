@@ -72,6 +72,7 @@ class CameraComposeFragment : BaseComposeFragment<CameraViewModel>() {
             AutoFitSurfaceView(context).apply {
                 holder.addCallback(object : SurfaceHolder.Callback {
                     override fun surfaceCreated(holder: SurfaceHolder) {
+                        vm.setSurface(holder.surface)
                         Timber.d("SurfaceView size: ${this@apply.width} x ${this@apply.height}")
                         vm.previewResolution.let {
                             this@apply.setAspectRatio(it.width, it.height)
@@ -108,14 +109,15 @@ class CameraComposeFragment : BaseComposeFragment<CameraViewModel>() {
                     Lifecycle.Event.ON_RESUME -> {
                         Timber.d("Compose Lifecycle on resume ")
                         lifecycleScope.launch(Dispatchers.Main) {
-                            vm.initCamera(
-                                surfaceView.holder.surface,
-                                cameraManager,
-                                args.cameraItem.logicalCameraId
-                            )
-//                            cameraInitJob?.await()
-                            Timber.d("Camera init completed, starting preview")
-                            vm.startPreview()
+                            vm.previewSurface.value?.let { surface ->
+                                vm.initCamera(
+                                    surface,
+                                    cameraManager,
+                                    args.cameraItem.logicalCameraId
+                                )
+                                Timber.d("Camera init completed, starting preview")
+                                vm.startPreview()
+                            }
                         }
                     }
                     Lifecycle.Event.ON_PAUSE -> {

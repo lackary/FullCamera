@@ -6,10 +6,13 @@ import android.hardware.camera2.CameraManager
 import android.hardware.camera2.params.StreamConfigurationMap
 import android.util.Size
 import android.view.Surface
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import com.lacklab.app.fullcamera.data.CameraDevice2Info
 import com.lacklab.app.fullcamera.domain.CameraControl
 import com.lacklab.app.fullcamera.ui.base.BaseViewModel
+import com.lacklab.app.fullcamera.util.Constant
 import com.lacklab.app.fullcamera.util.cam.ability.AeMode
 import com.lacklab.app.fullcamera.util.cam.ability.AwbMode
 import com.lacklab.app.fullcamera.util.cam.ability.CameraCapability
@@ -20,14 +23,12 @@ import timber.log.Timber
 
 class CameraViewModel(
     private val savedStateHandle: SavedStateHandle,
-) : BaseViewModel() {
-    companion object {
-        private const val KEY_CAMERA_ITEM = "camera_item"
-    }
+) : BaseViewModel(){
 
     private val cameraControl = CameraControl()
 
-    private val cameraDevice2Info = savedStateHandle.get<CameraDevice2Info>(KEY_CAMERA_ITEM)
+    private val cameraDevice2Info =
+        savedStateHandle.get<CameraDevice2Info>(Constant.KEY_CAMERA_ITEM)
 
     lateinit var previewResolution: Size
 
@@ -41,8 +42,15 @@ class CameraViewModel(
 
     private val _cameraInfo = MutableStateFlow<String>("fps")
     val cameraInfo: StateFlow<String> = _cameraInfo
+
+    private val _previewSurface = MutableLiveData<Surface>()
+    val previewSurface: LiveData<Surface> = _previewSurface
+
 //    var cameraInfo = MutableLiveData<String>()
 
+    fun setSurface(surface: Surface) {
+        _previewSurface.value = surface
+    }
 
     fun getCameraAbility(characteristics: CameraCharacteristics) {
         Timber.d("get streamConfigurationMap")
@@ -113,8 +121,9 @@ class CameraViewModel(
         }
         return maxSize
     }
-    suspend fun initCamera(previewSurface: Surface, manager: CameraManager, cameraId: String) =
-        cameraControl.initCamera(previewSurface, manager, cameraId, previewResolution, cameraDevice2Info)
+
+    suspend fun initCamera(surface: Surface, manager: CameraManager, cameraId: String, ) =
+        cameraControl.initCamera(surface, manager, cameraId, previewResolution, cameraDevice2Info)
 
     suspend fun startPreview() {
         cameraControl.startPreview().collect {

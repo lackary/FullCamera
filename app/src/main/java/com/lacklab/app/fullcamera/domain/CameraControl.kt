@@ -20,6 +20,7 @@ import com.lacklab.app.fullcamera.data.CameraDevice2Info
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.util.concurrent.Executor
@@ -103,7 +104,10 @@ class CameraControl {
         cameraId: String,
         handler: Handler
     ): CameraDevice = suspendCancellableCoroutine { cont ->
-        cameraManager.openCamera(cameraId, object : CameraDevice.StateCallback() {
+        cameraManager.openCamera(
+            cameraId,
+            Executors.newSingleThreadExecutor(),
+            object : CameraDevice.StateCallback() {
             override fun onOpened(device: CameraDevice) {
                 cont.resume(device)
             }
@@ -130,7 +134,7 @@ class CameraControl {
                 super.onClosed(camera)
             }
 
-        }, handler)
+        })
     }
 
     private suspend fun createCameraSession(

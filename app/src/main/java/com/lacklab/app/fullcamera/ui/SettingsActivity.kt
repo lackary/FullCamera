@@ -9,6 +9,7 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.lacklab.app.fullcamera.R
+import com.lacklab.app.fullcamera.util.Constant
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -31,7 +32,7 @@ class SettingsActivity : AppCompatActivity() {
             val screen = preferenceManager.createPreferenceScreen(context)
 
             val multiStreamingPreference = SwitchPreference(context)
-            multiStreamingPreference.key = "MULTI_STREAMING"
+            multiStreamingPreference.key = Constant.KEY_MULTI_STREAMING
             multiStreamingPreference.title = "Multi Streaming"
 //            multiStreamingPreference.summaryProvider =
 //                SummaryProvider<SwitchPreference> { preference ->
