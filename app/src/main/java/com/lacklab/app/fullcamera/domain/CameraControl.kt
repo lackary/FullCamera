@@ -85,6 +85,7 @@ class CameraControl {
         targetSurfaces.add(previewSurface)
         targetSurfaces.add(previewImageReader.surface)
         cameraDevice = openCamera(manager, cameraId, cameraHandler)
+
         captureSession = createCameraSession(cameraDevice, targetSurfaces, cameraHandler)
 
         captureRequestBuilder= cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
@@ -293,6 +294,34 @@ class CameraControl {
     }
 
     fun close() {
-        cameraDevice.close()
+        lastFrameNumber = 0L
+        measureFps = 0L
+        startTime = 0L
+        try {
+            captureSession.close()
+        } catch (e: Exception) {
+            Timber.e(e, "Error closing capture session")
+        }
+
+        try {
+            previewImageReader.close()
+        } catch (e: Exception) {
+            Timber.e(e, "Error closing image reader")
+        }
+
+        try {
+            cameraDevice.close()
+        } catch (e: Exception) {
+            Timber.e(e, "Error closing camera device")
+        }
+
+    }
+    fun clean() {
+        try {
+            previewImageReaderHandlerThread.quitSafely()
+            cameraHandlerThread.quitSafely()
+        } catch (e: Exception) {
+            Timber.e(e, "Error quitting handler threads")
+        }
     }
 }

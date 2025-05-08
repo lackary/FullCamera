@@ -1,21 +1,11 @@
 package com.lacklab.app.fullcamera.ui
 
-import android.R
 import android.graphics.ImageFormat
-import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraCharacteristics
-import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
-import android.hardware.camera2.CaptureRequest
 import android.hardware.camera2.params.StreamConfigurationMap
-import android.media.ImageReader
-import android.os.Handler
-import android.os.HandlerThread
 import android.util.Size
 import android.view.Surface
-import androidx.compose.runtime.MutableState
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import com.lacklab.app.fullcamera.data.CameraDevice2Info
 import com.lacklab.app.fullcamera.domain.CameraControl
@@ -29,12 +19,15 @@ import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 
 class CameraViewModel(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
+    companion object {
+        private const val KEY_CAMERA_ITEM = "camera_item"
+    }
 
     private val cameraControl = CameraControl()
 
-    private val cameraDevice2Info = savedStateHandle.get<CameraDevice2Info>("camera_item")
+    private val cameraDevice2Info = savedStateHandle.get<CameraDevice2Info>(KEY_CAMERA_ITEM)
 
     lateinit var previewResolution: Size
 
@@ -132,5 +125,9 @@ class CameraViewModel(
 
     fun close() {
         cameraControl.close()
+    }
+
+    fun clean() {
+        cameraControl.clean()
     }
 }

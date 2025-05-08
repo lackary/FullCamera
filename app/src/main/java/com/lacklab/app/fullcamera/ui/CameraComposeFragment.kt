@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -75,31 +76,19 @@ class CameraComposeFragment : BaseComposeFragment<CameraViewModel>() {
                         vm.previewResolution.let {
                             this@apply.setAspectRatio(it.width, it.height)
                         }
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            vm.initCamera(
-                                holder.surface,
-                                cameraManager,
-                                args.cameraItem.logicalCameraId
-                            )
-                            vm.startPreview()
-                        }
-
-                        view?.post {
-//                            vm.updateCameraInfo("相機已就緒")
-                        }
                     }
 
                     override fun surfaceChanged(
                         holder: SurfaceHolder,
                         p1: Int,
-                        p2: Int,
-                        p3: Int
+                        width: Int,
+                        height: Int
                     ) {
-//                        vm.updateCameraInfo("分辨率: ${p2}x${p3}")
+                        Timber.d("分辨率: ${width}x${height}")
                     }
 
                     override fun surfaceDestroyed(holder: SurfaceHolder) {
-//                        vm.updateCameraInfo("相機已關閉")
+                        Timber.d("camera was closed")
                     }
                 })
             }
@@ -107,11 +96,38 @@ class CameraComposeFragment : BaseComposeFragment<CameraViewModel>() {
 
         // Handle lifecycle events
         DisposableEffect(lifecycleOwner) {
+//            var cameraInitJob: Deferred<Unit>? = null
             val observer = LifecycleEventObserver { _, event ->
                 when (event) {
+                    Lifecycle.Event.ON_CREATE -> {
+                        Timber.d("Compose Lifecycle on create ")
+                    }
+                    Lifecycle.Event.ON_START -> {
+                        Timber.d("Compose Lifecycle on start ")
+                    }
+                    Lifecycle.Event.ON_RESUME -> {
+                        Timber.d("Compose Lifecycle on resume ")
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            vm.initCamera(
+                                surfaceView.holder.surface,
+                                cameraManager,
+                                args.cameraItem.logicalCameraId
+                            )
+//                            cameraInitJob?.await()
+                            Timber.d("Camera init completed, starting preview")
+                            vm.startPreview()
+                        }
+                    }
                     Lifecycle.Event.ON_PAUSE -> {
+                        Timber.d("Compose Lifecycle on pause ")
                         vm.close()
-//                        vm.updateCameraInfo("相機已暫停")
+                    }
+                    Lifecycle.Event.ON_STOP -> {
+                        Timber.d("Compose Lifecycle on stop ")
+                    }
+                    Lifecycle.Event.ON_DESTROY -> {
+                        Timber.d("Compose Lifecycle on destroy ")
+                        vm.clean()
                     }
                     else -> {}
                 }
